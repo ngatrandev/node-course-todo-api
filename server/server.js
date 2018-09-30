@@ -7,7 +7,7 @@ const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
 
 const app = express();
-app.use(bodyParser.json())
+app.use(bodyParser.json())// đây là middleware có bodyParser.json để chuyển các request thành json.
 app.post('/todos', (req, res)=> {
 const todo = new Todo ({
     text: req.body.text
@@ -20,7 +20,9 @@ todo.save().then((doc)=> {
 })
 app.listen(8080, ()=> {
   console.log('Started on port 8080'); 
-})
+});
+
+module.exports = {app};
 
 
 

@@ -4,7 +4,7 @@ const Todo = mongoose.model('Todo', {
     // Todo sẽ chạy vào todos trong collection
     text: {
         type: String,
-        require: true,
+        required: true,
         minlength: 1,
         trim: true   
     } ,
