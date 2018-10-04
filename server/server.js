@@ -48,12 +48,15 @@ res.send({todo});
 // })
 app.patch('/todos/:id', (req, res)=> {
     const id = req.params.id;
+    //Creates an object composed of the picked object properties.
     const body = _.pick(req.body, ['text', 'complete']);
+    
     if (!ObjectID.isValid(id)) {
         return res.status(404).send();
     };
     if(_.isBoolean(body.complete) && body.complete) {
         body.completeAt = new Date().getTime();
+    //để khi update complete = true thì completeAt sẽ chạy getTime
     } else {
         body.complete = false;
         body.completeAt = null;
@@ -66,7 +69,19 @@ app.patch('/todos/:id', (req, res)=> {
     }).catch((e) => {
         res.status(400).send();
     })
+});
+app.post('/users', (req, res)=> {
+    const body = _.pick(req.body, ['email', 'password']);
+    const user = new User (body);
+    user.save().then(()=> {
+     return user.generateAuthToken();
+    }).then((token)=> {
+        res.header('x-auth', token).send(user);
+    }).catch((e) => {
+        res.status(400).send(e);
+    })
 })
+
 app.listen(port, ()=> {
   console.log(`Started up at port ${port}`); 
 });
