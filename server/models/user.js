@@ -40,13 +40,30 @@ UserSchema.methods.toJSON = function () {
 UserSchema.methods.generateAuthToken = function () {
     //dùng UserSchema.methods. để tạo instance method.
 var user = this;
-const access = 'Auth';
-const token = jwt.sign({_id: user._id.toHexString(), access}, "mysecret").toString();
+var access = 'auth';
+var token = jwt.sign({_id: user._id.toHexString(), access}, "mysecret").toString();
 //Phần mysecret là string bất kì đc add vào để tăng bảo mật hoặc xác thực
 user.tokens.push({access, token});
 return user.save().then(()=> {
     return token;
 });
+};
+UserSchema.statics.findByToken = function (token) {
+    //dùng UserSchema.statics để tạo model method
+    var User = this;
+    var decoded;
+    try { 
+        decoded = jwt.verify(token, 'mysecret');
+        //verify dùng để xác thực data, sẽ báo lỗi nếu data bị thay đổi.
+    } catch (e) {
+        return Promise.reject();
+    }
+    return User.findOne({
+        '_id': decoded._id,
+        'tokens.token': token,//khi dẫn đến các property bên trong phải để trong quote. nested doc query
+        'tokens.access': 'auth'
+
+    })
 }
 const User = mongoose.model('User', UserSchema);  // User sẽ chạy vào users collection.
 
