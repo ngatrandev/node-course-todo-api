@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const _ = require('lodash');
 const jwt = require('jsonwebtoken');
+const bcrypt = require("bcryptjs");
 const UserSchema = new mongoose.Schema({
     email: {
         type: String,
@@ -64,7 +65,21 @@ UserSchema.statics.findByToken = function (token) {
         'tokens.access': 'auth'
 
     })
-}
+};
+UserSchema.pre('save', function (next) {
+    var user = this;
+    if (user.isModified("password")) {
+       bcrypt.genSalt(10, (err, salt)=> {
+           bcrypt.hash(user.password, salt, (err, hash)=> {
+               user.password = hash;
+               //thay password bằng giá trị hash (so với plain text ban đầu);
+               next(); //để complete middleware
+           })
+       }) 
+    } else {
+        next();
+    }
+});
 const User = mongoose.model('User', UserSchema);  // User sẽ chạy vào users collection.
 
 // const user = new User({
