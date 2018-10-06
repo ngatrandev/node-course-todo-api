@@ -49,6 +49,15 @@ return user.save().then(()=> {
     return token;
 });
 };
+UserSchema.methods.removeToken = function (token) {
+    var user = this;
+    return user.update({
+        $pull: {
+            tokens: {token}//dùng $pull để remove các element trong array tokens
+        }
+    });
+
+}
 UserSchema.statics.findByToken = function (token) {
     //dùng UserSchema.statics để tạo model method
     var User = this;
