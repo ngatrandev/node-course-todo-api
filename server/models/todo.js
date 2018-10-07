@@ -15,6 +15,10 @@ const Todo = mongoose.model('Todo', {
     completeAt: {
         type: Number,
         default: null
+    },
+    _creator: {
+        type: mongoose.Schema.Types.ObjectId,//để lấy id từ bên user
+        required: true
     }
 
 });
