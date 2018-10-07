@@ -42,8 +42,9 @@ UserSchema.methods.generateAuthToken = function () {
     //dùng UserSchema.methods. để tạo instance method.
 var user = this;
 var access = 'auth';
-var token = jwt.sign({_id: user._id.toHexString(), access}, "mysecret").toString();
-//Phần mysecret là string bất kì đc add vào để tăng bảo mật hoặc xác thực
+var token = jwt.sign({_id: user._id.toHexString(), access}, process.env.JWT_SECRET).toString();
+//Phần process.env.JWT_SECRET là string bất kì đc add vào để tăng bảo mật hoặc xác thực
+//process.env.JWT_SECRET được lưu trong file config.json không push github để bảo mật
 user.tokens.push({access, token});
 return user.save().then(()=> {
     return token;
@@ -63,7 +64,7 @@ UserSchema.statics.findByToken = function (token) {
     var User = this;
     var decoded;
     try { 
-        decoded = jwt.verify(token, 'mysecret');
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
         //verify dùng để xác thực data, sẽ báo lỗi nếu data bị thay đổi.
     } catch (e) {
         return Promise.reject();
